@@ -27,15 +27,6 @@ const FEATURES_BY_ROLE = {
   // Thêm các role khác nếu cần
 };
 
-const DEFAULT_FEATURES = [
-  { icon: "👨‍👩‍👧‍👦", title: "Hồ sơ sức khỏe" },
-  { icon: "💊", title: "Quản lý thuốc" },
-  { icon: "🚨", title: "Xử lý sự kiện y tế" },
-  { icon: "💉", title: "Tiêm chủng" },
-  { icon: "🩺", title: "Kiểm tra y tế định kỳ" },
-  { icon: "📊", title: "Báo cáo & Thống kê" },
-];
-
 const notifications = [
   {
     icon: "💉",
@@ -109,7 +100,7 @@ function HeaderForm() {
     if (role && FEATURES_BY_ROLE[role]) {
       return FEATURES_BY_ROLE[role];
     }
-    return DEFAULT_FEATURES;
+    return [];
   }, [role]);
 
   return (
@@ -147,7 +138,7 @@ function HeaderForm() {
           {showFeatureDropdown && (
             <div className="absolute left-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 z-50 animate-fade-in">
               <ul className="py-2">
-                {features.map((f, idx) => (
+                {features.length > 0 ? features.map((f, idx) => (
                   <li
                     key={idx}
                     className="px-4 py-2 hover:bg-blue-50 flex items-center gap-2 cursor-pointer text-gray-700 font-medium"
@@ -209,7 +200,17 @@ function HeaderForm() {
                   >
                     <span className="text-lg">{f.icon}</span> {f.title}
                   </li>
-                ))}
+                )) : (
+                  <li
+                    className="px-4 py-2 hover:bg-blue-50 flex items-center gap-2 cursor-pointer text-gray-700 font-medium"
+                    onClick={() => {
+                      navigate("/login");
+                      setShowFeatureDropdown(false);
+                    }}
+                  >
+                    <span className="text-lg">🔒</span> Đăng nhập để sử dụng chức năng
+                  </li>
+                )}
               </ul>
             </div>
           )}
@@ -275,48 +276,48 @@ function HeaderForm() {
         </div>
         {/* User */}
         <div className="relative" ref={accountDropdownRef}>
-          <button
-            className="flex items-center bg-gradient-to-r from-blue-500 to-indigo-500 rounded-2xl px-2 md:px-4 py-2 gap-1 md:gap-2 shadow-md focus:outline-none"
-            onClick={() => setShowAccountDropdown((v) => !v)}
-            type="button"
-          >
-            <UserCircleIcon className="w-7 h-7 md:w-8 md:h-8 text-white" />
-            <div className="flex flex-col text-white font-semibold text-sm md:text-base leading-tight">
-              <span className="truncate max-w-[60px] md:max-w-none">{lastName + " " + firstName || "Account"}</span>
-            </div>
-            <ChevronDownIcon className="w-4 h-4 text-white" />
-          </button>
-          {showAccountDropdown && (
+          {lastName || firstName ? (
+            <button
+              className="flex items-center bg-gradient-to-r from-blue-500 to-indigo-500 rounded-2xl px-2 md:px-4 py-2 gap-1 md:gap-2 shadow-md focus:outline-none"
+              onClick={() => setShowAccountDropdown((v) => !v)}
+              type="button"
+            >
+              <UserCircleIcon className="w-7 h-7 md:w-8 md:h-8 text-white" />
+              <div className="flex flex-col text-white font-semibold text-sm md:text-base leading-tight">
+                <span className="truncate max-w-[60px] md:max-w-none">{lastName + " " + firstName || "Account"}</span>
+              </div>
+              <ChevronDownIcon className="w-4 h-4 text-white" />
+            </button>
+          ) : (
+            <button
+              className="bg-gradient-to-r from-blue-500 to-indigo-500 rounded-2xl px-4 py-2 text-white font-semibold shadow-md focus:outline-none"
+              onClick={() => navigate("/login")}
+              type="button"
+            >
+              Đăng nhập
+            </button>
+          )}
+          {showAccountDropdown && (lastName || firstName) && (
             <div className="absolute right-0 mt-2 w-40 md:w-48 bg-white rounded-xl shadow-xl border border-gray-100 z-50 animate-fade-in">
               <ul className="py-2">
-                {lastName || firstName ? (
-                  <>
-                    <li>
-                      <a href="/profile" className="block px-4 py-2 text-gray-700 hover:bg-blue-50 font-medium">
-                        Xem profile
-                      </a>
-                    </li>
-                    <li>
-                      <a href="/change-password" className="block px-4 py-2 text-gray-700 hover:bg-blue-50 font-medium">
-                        Đổi mật khẩu
-                      </a>
-                    </li>
-                    <li>
-                      <button
-                        onClick={logout}
-                        className="w-full text-left px-4 py-2 text-gray-700 hover:bg-blue-50 font-medium"
-                      >
-                        Đăng xuất
-                      </button>
-                    </li>
-                  </>
-                ) : (
-                  <li>
-                    <a href="/login" className="block px-4 py-2 text-gray-700 hover:bg-blue-50 font-medium">
-                      Đăng nhập
-                    </a>
-                  </li>
-                )}
+                <li>
+                  <a href="/profile" className="block px-4 py-2 text-gray-700 hover:bg-blue-50 font-medium">
+                    Xem profile
+                  </a>
+                </li>
+                <li>
+                  <a href="/change-password" className="block px-4 py-2 text-gray-700 hover:bg-blue-50 font-medium">
+                    Đổi mật khẩu
+                  </a>
+                </li>
+                <li>
+                  <button
+                    onClick={logout}
+                    className="w-full text-left px-4 py-2 text-gray-700 hover:bg-blue-50 font-medium"
+                  >
+                    Đăng xuất
+                  </button>
+                </li>
               </ul>
             </div>
           )}
@@ -330,7 +331,7 @@ function HeaderForm() {
               <XMarkIcon className="w-6 h-6 text-gray-600" />
             </button>
             <a href="/" className="text-gray-700 font-semibold hover:text-blue-600 transition py-2">Trang chủ</a>
-            {features.map((f, idx) => (
+            {features.length > 0 ? features.map((f, idx) => (
               <div
                 key={idx}
                 className="flex items-center gap-2 py-2 px-2 rounded hover:bg-blue-50 cursor-pointer text-gray-700 font-medium"
@@ -392,7 +393,17 @@ function HeaderForm() {
               >
                 <span className="text-lg">{f.icon}</span> {f.title}
               </div>
-            ))}
+            )) : (
+              <div
+                className="flex items-center gap-2 py-2 px-2 rounded hover:bg-blue-50 cursor-pointer text-gray-700 font-medium"
+                onClick={() => {
+                  navigate("/login");
+                  setShowFeatureDropdown(false);
+                }}
+              >
+                <span className="text-lg">🔒</span> Đăng nhập để sử dụng chức năng
+              </div>
+            )}
             <a href="/documents" className="text-gray-700 font-semibold hover:text-blue-600 transition py-2">Tài liệu</a>
             <a href="/blog" className="text-gray-700 font-semibold hover:text-blue-600 transition py-2">Blog</a>
             <a href="/contact" className="text-gray-700 font-semibold hover:text-blue-600 transition py-2">Liên hệ</a>
