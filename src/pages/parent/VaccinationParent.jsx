@@ -1,12 +1,12 @@
 import HeaderForm from "../../components/HeaderForm";
 import FooterForm from "../../components/FooterForm";
-import EventInSchoolForm from "../../components/parent/EventInSchoolForm";
+import VaccinationForm from "../../components/parent/VaccinationForm";
 
-export default function ChangePassword() {
+export default function VaccinationParent() {
   return (
     <>
       <HeaderForm />
-      <EventInSchoolForm />
+      <VaccinationForm />
       <FooterForm />
     </>
   );

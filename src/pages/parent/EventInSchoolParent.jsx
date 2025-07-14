@@ -1,11 +1,12 @@
 import HeaderForm from "../../components/HeaderForm";
 import FooterForm from "../../components/FooterForm";
-import ListHealthRecordForm from "../../components/nurse/ListHealthRecordForm";
-export default function ChangePassword() {
+import EventInSchoolForm from "../../components/parent/EventInSchoolForm";
+
+export default function EventInSchoolParent() {
   return (
     <>
       <HeaderForm />
-      <ListHealthRecordForm />
+      <EventInSchoolForm />
       <FooterForm />
     </>
   );

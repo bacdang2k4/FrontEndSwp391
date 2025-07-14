@@ -1,12 +1,12 @@
 import HeaderForm from "../../components/HeaderForm";
 import FooterForm from "../../components/FooterForm";
-import MedicalSendForm from "../../components/parent/MedicalSendForm";
+import HealthRecordForm from "../../components/parent/HealthRecordForm";
 
-export default function MedicalSend() {
+export default function HealthRecordParent() {
   return (
     <>
       <HeaderForm />
-      <MedicalSendForm />
+      <HealthRecordForm />
       <FooterForm />
     </>
   );
