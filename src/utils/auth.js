@@ -22,7 +22,7 @@ export const isAuthenticated = () => {
   return !!getToken();
 };
 
-export const logout = () => {
+export const logout = (navigate) => {
   removeTokens();
-  window.location.href = '/login';
+  navigate('/login');
 }; 

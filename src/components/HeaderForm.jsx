@@ -340,7 +340,7 @@ function HeaderForm() {
                 </li>
                 <li>
                   <button
-                    onClick={logout}
+                    onClick={() => logout(navigate)}
                     className="w-full text-left px-4 py-2 text-gray-700 hover:bg-blue-50 font-medium bg-transparent border-none outline-none cursor-pointer"
                     type="button"
                   >
