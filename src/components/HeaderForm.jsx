@@ -124,9 +124,13 @@ function HeaderForm() {
       </div>
       {/* Menu - desktop only */}
       <nav className="hidden md:flex flex-1 justify-center gap-4 md:gap-8">
-        <a href="/" className="text-gray-700 font-semibold hover:text-blue-600 transition">
+        <button
+          className="text-gray-700 font-semibold hover:text-blue-600 transition bg-transparent border-none outline-none cursor-pointer"
+          onClick={() => navigate("/")}
+          type="button"
+        >
           Trang chủ
-        </a>
+        </button>
         <div className="relative" ref={featureDropdownRef}>
           <button
             className="flex items-center gap-1 text-gray-700 font-semibold hover:text-blue-600 transition focus:outline-none"
@@ -215,15 +219,27 @@ function HeaderForm() {
             </div>
           )}
         </div>
-        <a href="/documents" className="text-gray-700 font-semibold hover:text-blue-600 transition">
+        <button
+          className="text-gray-700 font-semibold hover:text-blue-600 transition bg-transparent border-none outline-none cursor-pointer"
+          onClick={() => navigate("/documents")}
+          type="button"
+        >
           Tài liệu
-        </a>
-        <a href="/blog" className="text-gray-700 font-semibold hover:text-blue-600 transition">
+        </button>
+        <button
+          className="text-gray-700 font-semibold hover:text-blue-600 transition bg-transparent border-none outline-none cursor-pointer"
+          onClick={() => navigate("/blog")}
+          type="button"
+        >
           Blog
-        </a>
-        <a href="/contact" className="text-gray-700 font-semibold hover:text-blue-600 transition">
+        </button>
+        <button
+          className="text-gray-700 font-semibold hover:text-blue-600 transition bg-transparent border-none outline-none cursor-pointer"
+          onClick={() => navigate("/contact")}
+          type="button"
+        >
           Liên hệ
-        </a>
+        </button>
       </nav>
       {/* Notification + User */}
       <div className="flex items-center gap-2 md:gap-4 min-w-[120px] md:min-w-[220px] justify-end relative">
@@ -267,9 +283,13 @@ function HeaderForm() {
                 ))}
               </div>
               <div className="py-3 text-center border-t border-gray-100">
-                <a href="#" className="text-blue-600 text-sm font-medium hover:underline">
+                <button
+                  className="text-blue-600 text-sm font-medium hover:underline bg-transparent border-none outline-none cursor-pointer"
+                  onClick={() => navigate("/notifications")}
+                  type="button"
+                >
                   Xem tất cả thông báo
-                </a>
+                </button>
               </div>
             </div>
           )}
@@ -301,19 +321,28 @@ function HeaderForm() {
             <div className="absolute right-0 mt-2 w-40 md:w-48 bg-white rounded-xl shadow-xl border border-gray-100 z-50 animate-fade-in">
               <ul className="py-2">
                 <li>
-                  <a href="/profile" className="block px-4 py-2 text-gray-700 hover:bg-blue-50 font-medium">
+                  <button
+                    className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-blue-50 font-medium bg-transparent border-none outline-none cursor-pointer"
+                    onClick={() => navigate("/profile")}
+                    type="button"
+                  >
                     Xem profile
-                  </a>
+                  </button>
                 </li>
                 <li>
-                  <a href="/change-password" className="block px-4 py-2 text-gray-700 hover:bg-blue-50 font-medium">
+                  <button
+                    className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-blue-50 font-medium bg-transparent border-none outline-none cursor-pointer"
+                    onClick={() => navigate("/change-password")}
+                    type="button"
+                  >
                     Đổi mật khẩu
-                  </a>
+                  </button>
                 </li>
                 <li>
                   <button
                     onClick={logout}
-                    className="w-full text-left px-4 py-2 text-gray-700 hover:bg-blue-50 font-medium"
+                    className="w-full text-left px-4 py-2 text-gray-700 hover:bg-blue-50 font-medium bg-transparent border-none outline-none cursor-pointer"
+                    type="button"
                   >
                     Đăng xuất
                   </button>
@@ -330,7 +359,13 @@ function HeaderForm() {
             <button className="self-end mb-2" onClick={() => setShowFeatureDropdown(false)}>
               <XMarkIcon className="w-6 h-6 text-gray-600" />
             </button>
-            <a href="/" className="text-gray-700 font-semibold hover:text-blue-600 transition py-2">Trang chủ</a>
+            <button
+              className="text-gray-700 font-semibold hover:text-blue-600 transition py-2 bg-transparent border-none outline-none cursor-pointer text-left"
+              onClick={() => navigate("/")}
+              type="button"
+            >
+              Trang chủ
+            </button>
             {features.length > 0 ? features.map((f, idx) => (
               <div
                 key={idx}
@@ -404,9 +439,27 @@ function HeaderForm() {
                 <span className="text-lg">🔒</span> Đăng nhập để sử dụng chức năng
               </div>
             )}
-            <a href="/documents" className="text-gray-700 font-semibold hover:text-blue-600 transition py-2">Tài liệu</a>
-            <a href="/blog" className="text-gray-700 font-semibold hover:text-blue-600 transition py-2">Blog</a>
-            <a href="/contact" className="text-gray-700 font-semibold hover:text-blue-600 transition py-2">Liên hệ</a>
+            <button
+              className="text-gray-700 font-semibold hover:text-blue-600 transition py-2 bg-transparent border-none outline-none cursor-pointer text-left"
+              onClick={() => navigate("/documents")}
+              type="button"
+            >
+              Tài liệu
+            </button>
+            <button
+              className="text-gray-700 font-semibold hover:text-blue-600 transition py-2 bg-transparent border-none outline-none cursor-pointer text-left"
+              onClick={() => navigate("/blog")}
+              type="button"
+            >
+              Blog
+            </button>
+            <button
+              className="text-gray-700 font-semibold hover:text-blue-600 transition py-2 bg-transparent border-none outline-none cursor-pointer text-left"
+              onClick={() => navigate("/contact")}
+              type="button"
+            >
+              Liên hệ
+            </button>
           </div>
         </div>
       )}
