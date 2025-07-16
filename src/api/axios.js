@@ -470,4 +470,40 @@ export const sendAdminCheckupResultNotification = async (id) => {
   return response.data;
 };
 
+// Lấy báo cáo user (Admin)
+export const getUserReport = async () => {
+  const response = await api.get('/v1/reports/users');
+  return response.data;
+};
+
+// Lấy báo cáo tổng quan sức khỏe (Admin)
+export const getHealthOverviewReport = async () => {
+  const response = await api.get('/v1/reports/health-overview');
+  return response.data;
+};
+
+// Lấy báo cáo sự kiện y tế (Admin)
+export const getMedicalEventReport = async () => {
+  const response = await api.get('/v1/reports/medical-events');
+  return response.data;
+};
+
+// Lấy báo cáo tiêm chủng (Admin)
+export const getVaccinationReport = async () => {
+  const response = await api.get('/v1/reports/vaccination');
+  return response.data;
+};
+
+// Lấy báo cáo kiểm tra sức khỏe (Admin)
+export const getCheckupReport = async () => {
+  const response = await api.get('/v1/reports/checkup');
+  return response.data;
+};
+
+// Lấy báo cáo sử dụng thuốc (Admin)
+export const getMedicineUsageReport = async () => {
+  const response = await api.get('/v1/reports/medicine-usage');
+  return response.data;
+};
+
 
