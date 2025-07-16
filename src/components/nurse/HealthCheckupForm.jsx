@@ -1,6 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { getNurseCheckupEventList, getNurseCheckupParticipants, updateNurseCheckupRecord } from "../../api/axios";
 
+// Toast component
+function Toast({ message, type, onClose }) {
+  if (!message) return null;
+  return (
+    <div className={`fixed top-6 right-6 z-50 px-6 py-4 rounded-lg shadow-lg text-white transition-all duration-300 ${type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}
+      onClick={onClose}
+      role="alert"
+    >
+      {message}
+    </div>
+  );
+}
+
 function HealthCheckupForm() {
   const [events, setEvents] = useState([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
@@ -15,6 +28,16 @@ function HealthCheckupForm() {
   const [recordForm, setRecordForm] = useState({ vision: "", hearing: "", weight: "", height: "" });
   const [recordLoading, setRecordLoading] = useState(false);
   const [recordError, setRecordError] = useState("");
+
+  // Toast state
+  const [toast, setToast] = useState({ message: '', type: 'success' });
+  // Toast auto close
+  useEffect(() => {
+    if (toast.message) {
+      const timer = setTimeout(() => setToast({ ...toast, message: '' }), 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
 
   const mapStatusLabel = (status) => {
     const statusMap = {
@@ -103,9 +126,11 @@ function HealthCheckupForm() {
     try {
       await updateNurseCheckupRecord(recordTarget.record.id, recordForm);
       setShowRecordModal(false);
+      setToast({ message: 'Cập nhật kết quả thành công!', type: 'success' });
       if (selectedEvent) handleShowParticipants(selectedEvent);
     } catch {
       setRecordError("Có lỗi xảy ra, vui lòng thử lại");
+      setToast({ message: 'Có lỗi khi cập nhật kết quả!', type: 'error' });
     } finally {
       setRecordLoading(false);
     }
@@ -113,6 +138,8 @@ function HealthCheckupForm() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 p-4 md:p-6">
+      {/* Toast notification */}
+      <Toast message={toast.message} type={toast.type} onClose={() => setToast({ ...toast, message: '' })} />
       <div className="max-w-7xl mx-auto">
         {/* Enhanced Header */}
         <div className="mb-8">

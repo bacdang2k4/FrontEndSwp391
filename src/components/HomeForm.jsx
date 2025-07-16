@@ -16,9 +16,11 @@ import {
   PhoneIcon,
   DocumentTextIcon,
   BellIcon,
-  StarIcon
+  StarIcon,
+  CalendarDaysIcon
 } from "@heroicons/react/24/outline"
 import { useNavigate } from "react-router-dom"
+import { getProfile } from "../api/axios"
 import banner1 from "../../images/banner1.jpg"
 
 const bannerSlides = [
@@ -65,87 +67,6 @@ const bannerSlides = [
     ctaLink: "/blog",
     bgGradient: "from-purple-600/90 via-violet-600/80 to-indigo-600/90",
     features: ["International Standards", "Advanced Prevention", "Safe Environment"]
-  },
-]
-
-const newsArticles = [
-  {
-    id: 1,
-    title: "Hướng dẫn phòng chống cúm mùa cho học sinh",
-    summary: "Các biện pháp hiệu quả để phòng ngừa cúm mùa trong môi trường học đường, bao gồm vệ sinh cá nhân và tăng cường sức đề kháng.",
-    image: "/placeholder.svg?height=300&width=400",
-    author: "BS. Nguyễn Thị Lan",
-    date: "15/01/2025",
-    category: "Sức khỏe",
-    readTime: "5 phút đọc",
-    isHot: true,
-    views: "2.1k",
-    priority: "high"
-  },
-  {
-    id: 2,
-    title: "Chế độ dinh dưỡng cân bằng cho trẻ em tuổi học đường",
-    summary: "Menu dinh dưỡng khoa học giúp trẻ phát triển toàn diện về thể chất và trí tuệ, được khuyến nghị bởi chuyên gia dinh dưỡng.",
-    image: "/placeholder.svg?height=300&width=400",
-    author: "TS. Trần Văn Minh",
-    date: "12/01/2025",
-    category: "Dinh dưỡng",
-    readTime: "7 phút đọc",
-    isHot: false,
-    views: "1.8k",
-    priority: "medium"
-  },
-  {
-    id: 3,
-    title: "Tầm quan trọng của việc kiểm tra thị lực định kỳ",
-    summary: "Phát hiện sớm các vấn đề về mắt ở trẻ em để có biện pháp can thiệp kịp thời, bảo vệ thị lực cho tương lai.",
-    image: "/placeholder.svg?height=300&width=400",
-    author: "BS. Lê Thị Hoa",
-    date: "10/01/2025",
-    category: "Khám sức khỏe",
-    readTime: "4 phút đọc",
-    isHot: false,
-    views: "1.5k",
-    priority: "medium"
-  },
-  {
-    id: 4,
-    title: "Cách xử lý khi trẻ bị sốt tại trường học",
-    summary: "Quy trình chuẩn để xử lý tình huống trẻ bị sốt trong giờ học, đảm bảo an toàn và hiệu quả nhất.",
-    image: "/placeholder.svg?height=300&width=400",
-    author: "Y tá Phạm Thị Mai",
-    date: "08/01/2025",
-    category: "Cấp cứu",
-    readTime: "6 phút đọc",
-    isHot: true,
-    views: "3.2k",
-    priority: "high"
-  },
-  {
-    id: 5,
-    title: "Lợi ích của hoạt động thể chất đối với sức khỏe học sinh",
-    summary: "Tập thể dục đều đặn không chỉ giúp cải thiện sức khỏe thể chất mà còn nâng cao khả năng học tập và tinh thần.",
-    image: "/placeholder.svg?height=300&width=400",
-    author: "ThS. Hoàng Văn Nam",
-    date: "05/01/2025",
-    category: "Thể chất",
-    readTime: "8 phút đọc",
-    isHot: false,
-    views: "2.7k",
-    priority: "low"
-  },
-  {
-    id: 6,
-    title: "Chăm sóc sức khỏe răng miệng cho trẻ em",
-    summary: "Hướng dẫn chi tiết về cách chăm sóc răng miệng đúng cách, phòng ngừa sâu răng và các bệnh lý nha khoa.",
-    image: "/placeholder.svg?height=300&width=400",
-    author: "BS. Nha khoa Vũ Thị Lan",
-    date: "03/01/2025",
-    category: "Nha khoa",
-    readTime: "5 phút đọc",
-    isHot: false,
-    views: "1.9k",
-    priority: "low"
   },
 ]
 
@@ -206,50 +127,111 @@ const features = [
   },
 ]
 
-const quickAccess = [
-  {
-    icon: "🏥",
-    title: "Khai báo hồ sơ sức khỏe",
-    desc: "Cập nhật thông tin sức khỏe con em một cách nhanh chóng và bảo mật",
-    color: "from-blue-500 to-cyan-500",
-    link: "/health-record"
-  },
-  {
-    icon: "💊",
-    title: "Gửi thuốc cho trường",
-    desc: "Đăng ký gửi thuốc với hướng dẫn chi tiết và theo dõi tình trạng",
-    color: "from-purple-500 to-pink-500",
-    link: "/medical-send"
-  },
-  {
-    icon: "📅",
-    title: "Lịch kiểm tra y tế",
-    desc: "Xem lịch kiểm tra y tế định kỳ và đặt lịch hẹn trực tuyến",
-    color: "from-green-500 to-teal-500",
-    link: "/health-checkup"
-  },
-  {
-    icon: "💉",
-    title: "Lịch tiêm chủng",
-    desc: "Theo dõi lịch tiêm chủng và nhận thông báo nhắc nhở tự động",
-    color: "from-orange-500 to-red-500",
-    link: "/vaccination"
-  },
-  {
-    icon: "🚨",
-    title: "Liên hệ y tế khẩn cấp",
-    desc: "Đường dây nóng 24/7 cho các tình huống y tế khẩn cấp",
-    color: "from-red-500 to-pink-500",
-    link: "/contact"
-  },
-  {
-    icon: "📚",
-    title: "Tài liệu sức khỏe",
-    desc: "Thư viện tài liệu y tế phong phú với nội dung cập nhật liên tục",
-    color: "from-indigo-500 to-purple-500",
-    link: "/documents"
-  },
-]
+// Role-based features (copy from HeaderForm.jsx for consistency)
+const ROLE_FEATURES = {
+  PARENT: [
+    { 
+      icon: HeartIcon, 
+      title: "Hồ sơ sức khỏe", 
+      path: "/parent/health-record", 
+      color: "text-sky-600",
+      bgColor: "bg-sky-50",
+      description: "Theo dõi sức khỏe con em"
+    },
+    { 
+      icon: SparklesIcon, 
+      title: "Gửi thuốc", 
+      path: "/parent/medical-send-history", 
+      color: "text-emerald-600",
+      bgColor: "bg-emerald-50",
+      description: "Đăng ký gửi thuốc"
+    },
+    { 
+      icon: ShieldCheckIcon, 
+      title: "Tiêm chủng", 
+      path: "/parent/medical-vaccine", 
+      color: "text-violet-600",
+      bgColor: "bg-violet-50",
+      description: "Lịch tiêm chủng"
+    },
+    { 
+      icon: ClockIcon, 
+      title: "Kiểm tra y tế", 
+      path: "/parent/health-checkup", 
+      color: "text-teal-600",
+      bgColor: "bg-teal-50",
+      description: "Lịch khám định kỳ"
+    },
+    { 
+      icon: CalendarDaysIcon, 
+      title: "Sự kiện y tế", 
+      path: "/parent/event-in-school", 
+      color: "text-rose-600",
+      bgColor: "bg-rose-50",
+      description: "Xem sự kiện y tế trong trường"
+    },
+  ],
+  NURSE: [
+    { 
+      icon: HeartIcon, 
+      title: "Hồ sơ học sinh", 
+      path: "/nurse/list-health-records", 
+      color: "text-sky-600",
+      bgColor: "bg-sky-50",
+      description: "Quản lý hồ sơ sức khỏe"
+    },
+    { 
+      icon: SparklesIcon, 
+      title: "Quản lý thuốc", 
+      path: "/nurse/list-medical-send", 
+      color: "text-emerald-600",
+      bgColor: "bg-emerald-50",
+      description: "Xử lý thuốc từ phụ huynh"
+    },
+    { 
+      icon: ShieldCheckIcon, 
+      title: "Tiêm chủng", 
+      path: "/nurse/vaccination", 
+      color: "text-violet-600",
+      bgColor: "bg-violet-50",
+      description: "Quản lý tiêm chủng"
+    },
+    { 
+      icon: ClockIcon, 
+      title: "Kiểm tra y tế", 
+      path: "/nurse/health-checkup", 
+      color: "text-teal-600",
+      bgColor: "bg-teal-50",
+      description: "Quản lý kiểm tra sức khỏe"
+    },
+    { 
+      icon: CalendarDaysIcon, 
+      title: "Sự kiện y tế", 
+      path: "/nurse/event-in-school", 
+      color: "text-rose-600",
+      bgColor: "bg-rose-50",
+      description: "Quản lý sự kiện y tế"
+    },
+    { 
+      icon: DocumentTextIcon, 
+      title: "Kho vật tư", 
+      path: "/nurse/warehouse", 
+      color: "text-orange-600",
+      bgColor: "bg-orange-50",
+      description: "Quản lý vật tư y tế"
+    },
+  ],
+  ADMIN: [
+    { 
+      icon: ShieldCheckIcon, 
+      title: "Dashboard", 
+      path: "/admin/dashboard", 
+      color: "text-indigo-600",
+      bgColor: "bg-indigo-50",
+      description: "Quản trị hệ thống"
+    },
+  ]
+}
 
 const stats = [
   { value: "1,247", label: "Học sinh đăng ký", icon: "👥", change: "+12%", trend: "up" },
@@ -263,12 +245,24 @@ function HomeForm() {
   const navigate = useNavigate()
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isAutoPlay, setIsAutoPlay] = useState(true)
-  const [currentNewsSlide, setCurrentNewsSlide] = useState(0)
-  const [isNewsAutoPlay, setIsNewsAutoPlay] = useState(true)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  const [userRole, setUserRole] = useState("PARENT")
   
   const heroRef = useRef(null)
   const observerRef = useRef(null)
+
+  // Fetch user profile to get role
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const data = await getProfile()
+        setUserRole(data.result.role || "PARENT")
+      } catch {
+        setUserRole("PARENT")
+      }
+    }
+    fetchProfile()
+  }, [])
 
   // Intersection Observer for animations
   useEffect(() => {
@@ -320,27 +314,8 @@ function HomeForm() {
     return () => clearInterval(interval)
   }, [isAutoPlay])
 
-  // Auto-slide functionality for news
-  useEffect(() => {
-    if (!isNewsAutoPlay) return
-
-    const interval = setInterval(() => {
-      setCurrentNewsSlide((prev) => (prev + 1) % Math.ceil(newsArticles.length / 3))
-    }, 5000)
-
-    return () => clearInterval(interval)
-  }, [isNewsAutoPlay])
-
   const goToSlide = (index) => {
     setCurrentSlide(index)
-  }
-
-  const nextNewsSlide = () => {
-    setCurrentNewsSlide((prev) => (prev + 1) % Math.ceil(newsArticles.length / 3))
-  }
-
-  const prevNewsSlide = () => {
-    setCurrentNewsSlide((prev) => (prev - 1 + Math.ceil(newsArticles.length / 3)) % Math.ceil(newsArticles.length / 3))
   }
 
   return (
@@ -465,21 +440,24 @@ function HomeForm() {
             <p className="text-gray-600 text-lg">Các chức năng thường sử dụng nhất</p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-            {quickAccess.map((item, idx) => (
-              <div
-                key={idx}
-                className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-all duration-300 cursor-pointer group hover:-translate-y-2"
-                onClick={() => navigate(item.link)}
-              >
-                <div className={`w-14 h-14 mx-auto mb-4 rounded-xl bg-gradient-to-r ${item.color} flex items-center justify-center text-2xl shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                  {item.icon}
+            {(ROLE_FEATURES[userRole] || ROLE_FEATURES.PARENT).map((item, idx) => {
+              const Icon = item.icon;
+              return (
+                <div
+                  key={idx}
+                  className={`bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-all duration-300 cursor-pointer group hover:-translate-y-2`}
+                  onClick={() => navigate(item.path)}
+                >
+                  <div className={`w-14 h-14 mx-auto mb-4 rounded-xl flex items-center justify-center text-2xl shadow-lg group-hover:scale-110 transition-transform duration-300 ${item.bgColor}`}>
+                    <Icon className={`w-7 h-7 ${item.color}`} />
+                  </div>
+                  <h4 className="text-sm font-bold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors text-center line-clamp-2">
+                    {item.title}
+                  </h4>
+                  <p className="text-xs text-gray-600 text-center line-clamp-2">{item.description}</p>
                 </div>
-                <h4 className="text-sm font-bold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors text-center line-clamp-2">
-                  {item.title}
-                </h4>
-                <p className="text-xs text-gray-600 text-center line-clamp-2">{item.desc}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -509,177 +487,6 @@ function HomeForm() {
                 </div>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* News Section */}
-      <section
-        className="py-20 px-4 bg-white"
-        onMouseEnter={() => setIsNewsAutoPlay(false)}
-        onMouseLeave={() => setIsNewsAutoPlay(true)}
-        data-animate="news"
-      >
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">Tin tức sức khỏe</h2>
-            <p className="text-gray-600 text-xl">Cập nhật thông tin y tế và sức khỏe học đường mới nhất</p>
-          </div>
-
-          {/* Featured News */}
-          <div className="mb-12">
-            <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-              <BellIcon className="w-6 h-6 text-red-500" />
-              Tin nổi bật
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {newsArticles.filter(article => article.isHot).slice(0, 2).map((article) => (
-                <div
-                  key={article.id}
-                  className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 group hover:-translate-y-2 border-l-4 border-red-500"
-                >
-                  <div className="relative overflow-hidden">
-                    <img
-                      src={article.image || "/placeholder.svg"}
-                      alt={article.title}
-                      className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold flex items-center gap-1">
-                      🔥 HOT
-                    </div>
-                    <div className="absolute top-4 right-4 bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-                      {article.category}
-                    </div>
-                  </div>
-
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold text-gray-800 mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors">
-                      {article.title}
-                    </h3>
-                    <p className="text-gray-600 text-sm mb-4 line-clamp-3 leading-relaxed">{article.summary}</p>
-
-                    <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                      <div className="flex items-center gap-2">
-                        <UserIcon className="w-4 h-4" />
-                        <span>{article.author}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <CalendarIcon className="w-4 h-4" />
-                        <span>{article.date}</span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-blue-600 font-medium">{article.readTime}</span>
-                      <button className="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium transition-colors group">
-                        Đọc thêm
-                        <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Regular News Carousel */}
-          <div className="relative overflow-hidden">
-            <div
-              className="flex transition-transform duration-500 ease-in-out"
-              style={{ transform: `translateX(-${currentNewsSlide * 100}%)` }}
-            >
-              {Array.from({ length: Math.ceil(newsArticles.filter(article => !article.isHot).length / 3) }).map((_, slideIndex) => (
-                <div key={slideIndex} className="w-full flex-shrink-0">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-4">
-                    {newsArticles.filter(article => !article.isHot).slice(slideIndex * 3, slideIndex * 3 + 3).map((article) => (
-                      <div
-                        key={article.id}
-                        className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 group hover:-translate-y-2"
-                      >
-                        <div className="relative overflow-hidden">
-                          <img
-                            src={article.image || "/placeholder.svg"}
-                            alt={article.title}
-                            className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                          <div className="absolute top-4 right-4 bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-                            {article.category}
-                          </div>
-                        </div>
-
-                        <div className="p-6">
-                          <h3 className="text-xl font-bold text-gray-800 mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors">
-                            {article.title}
-                          </h3>
-                          <p className="text-gray-600 text-sm mb-4 line-clamp-3 leading-relaxed">{article.summary}</p>
-
-                          <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                            <div className="flex items-center gap-2">
-                              <UserIcon className="w-4 h-4" />
-                              <span>{article.author}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <CalendarIcon className="w-4 h-4" />
-                              <span>{article.date}</span>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-blue-600 font-medium">{article.readTime}</span>
-                            <button className="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium transition-colors group">
-                              Đọc thêm
-                              <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* News Navigation Arrows */}
-            <button
-              onClick={prevNewsSlide}
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white shadow-lg text-gray-800 p-3 rounded-full hover:bg-gray-50 transition-all duration-200 z-10"
-              title="Tin tức trước"
-            >
-              <ChevronLeftIcon className="w-6 h-6" />
-            </button>
-
-            <button
-              onClick={nextNewsSlide}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white shadow-lg text-gray-800 p-3 rounded-full hover:bg-gray-50 transition-all duration-200 z-10"
-              title="Tin tức tiếp theo"
-            >
-              <ChevronRightIcon className="w-6 h-6" />
-            </button>
-          </div>
-
-          {/* News Dots Indicator */}
-          <div className="flex justify-center mt-8 space-x-2">
-            {Array.from({ length: Math.ceil(newsArticles.filter(article => !article.isHot).length / 3) }).map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentNewsSlide(index)}
-                className={`w-3 h-3 rounded-full transition-all duration-200 ${
-                  index === currentNewsSlide ? "bg-blue-600 scale-125" : "bg-gray-300 hover:bg-gray-400"
-                }`}
-              />
-            ))}
-          </div>
-
-          {/* View All News Button */}
-          <div className="text-center mt-12">
-            <button
-              onClick={() => navigate("/blog")}
-              className="inline-flex items-center gap-3 bg-blue-600 text-white font-bold py-4 px-8 rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105"
-            >
-              <DocumentTextIcon className="w-5 h-5" />
-              Xem tất cả tin tức
-              <ArrowRightIcon className="w-5 h-5" />
-            </button>
           </div>
         </div>
       </section>

@@ -1,6 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { getNurseStudentList, getNurseMedicineList, createNurseMedicalEvent } from "../../api/axios";
 
+// Toast component
+function Toast({ message, type, onClose }) {
+  if (!message) return null;
+  return (
+    <div className={`fixed top-6 right-6 z-50 px-6 py-4 rounded-lg shadow-lg text-white transition-all duration-300 ${type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}
+      onClick={onClose}
+      role="alert"
+    >
+      {message}
+    </div>
+  );
+}
+
 function EventInSchoolForm() {
   const [events, setEvents] = useState([]);
   const [filteredEvents, setFilteredEvents] = useState([]);
@@ -213,17 +226,27 @@ function EventInSchoolForm() {
     }));
   };
 
+  // Toast state
+  const [toast, setToast] = useState({ message: '', type: 'success' });
+  // Toast auto close
+  useEffect(() => {
+    if (toast.message) {
+      const timer = setTimeout(() => setToast({ ...toast, message: '' }), 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     // Validate medicine quantities
     const quantityErrors = validateMedicineQuantities();
     if (quantityErrors.length > 0) {
-      alert('Lỗi số lượng thuốc:\n' + quantityErrors.join('\n'));
+      setToast({ message: 'Lỗi số lượng thuốc: ' + quantityErrors.join(' | '), type: 'error' });
       return;
     }
     if (!addForm.studentId) {
-      alert('Vui lòng chọn học sinh!');
+      setToast({ message: 'Vui lòng chọn học sinh!', type: 'error' });
       return;
     }
 
@@ -241,12 +264,12 @@ function EventInSchoolForm() {
     };
     try {
       await createNurseMedicalEvent(addForm.studentId, payload);
-      alert('Tạo sự kiện thành công!');
+      setToast({ message: 'Tạo sự kiện thành công!', type: 'success' });
       handleCloseAddModal();
       fetchEvents(); // Load lại danh sách sự kiện
     } catch (err) {
       console.error('Lỗi khi tạo sự kiện:', err);
-      alert('Có lỗi khi tạo sự kiện!');
+      setToast({ message: 'Có lỗi khi tạo sự kiện!', type: 'error' });
     }
   };
 
@@ -278,21 +301,14 @@ function EventInSchoolForm() {
     { key: 'other', label: 'Khác', color: 'bg-gray-100 text-gray-800', icon: '📋' },
   ];
 
-  // Thêm map type -> label
-  const eventTypeLabels = {
-    accident: 'Tai nạn',
-    illness: 'Ốm đau',
-    allergy: 'Dị ứng',
-    emergency: 'Khẩn cấp',
-    other: 'Khác',
-  };
-
   const getEventTypeInfo = (type) => {
     return eventTypes.find(et => et.key === type) || { label: type, color: 'bg-gray-100 text-gray-800', icon: '📋' };
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 p-4 md:p-6">
+      {/* Toast notification */}
+      <Toast message={toast.message} type={toast.type} onClose={() => setToast({ ...toast, message: '' })} />
       <div className="max-w-7xl mx-auto">
         {/* Enhanced Header */}
         <div className="mb-8">

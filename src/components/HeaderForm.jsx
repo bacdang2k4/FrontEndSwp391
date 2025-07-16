@@ -605,16 +605,7 @@ function HeaderForm() {
                           <UserCircleIcon className="w-4 h-4" />
                           Hồ sơ cá nhân
                         </button>
-                        <button
-                          onClick={() => {
-                            navigate("/change-password")
-                            setShowAccount(false)
-                          }}
-                          className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors font-medium text-gray-700 hover:text-sky-600 flex items-center gap-2"
-                        >
-                          <ShieldCheckIcon className="w-4 h-4" />
-                          Đổi mật khẩu
-                        </button>
+                        
                         <hr className="my-2 border-gray-200" />
                         <button
                           onClick={() => logoutUser(navigate)}

@@ -1,11 +1,54 @@
 import { useEffect, useState } from "react";
 import { getNurseMedicalSentList, approveMedicalSend, setUse } from "../../api/axios";
 
+// Toast component
+function Toast({ message, type, onClose }) {
+  if (!message) return null;
+  return (
+    <div className={`fixed top-6 right-6 z-50 px-6 py-4 rounded-lg shadow-lg text-white transition-all duration-300 ${type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}
+      onClick={onClose}
+      role="alert"
+    >
+      {message}
+    </div>
+  );
+}
+
+// Confirm Modal component
+function ConfirmModal({ open, title, message, onConfirm, onCancel }) {
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/20 bg-opacity-10">
+      <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-md">
+        <h3 className="text-lg font-bold mb-2">{title}</h3>
+        <p className="mb-6 text-gray-700">{message}</p>
+        <div className="flex justify-end gap-2">
+          <button onClick={onCancel} className="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300">Huỷ</button>
+          <button onClick={onConfirm} className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700">Xác nhận</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ListMedicalSendForm() {
   const [list, setList] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState("all");
+
+  // Toast state
+  const [toast, setToast] = useState({ message: '', type: 'success' });
+  // Confirm modal state
+  const [confirm, setConfirm] = useState({ open: false, action: null, item: null, title: '', message: '' });
+
+  // Toast auto close
+  useEffect(() => {
+    if (toast.message) {
+      const timer = setTimeout(() => setToast({ ...toast, message: '' }), 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -34,34 +77,50 @@ function ListMedicalSendForm() {
 
   // Xác nhận đã nhận thuốc
   const handleApprove = async (item) => {
-    if (!window.confirm("Xác nhận đã nhận thuốc cho đơn này?")) return;
-    try {
-      await approveMedicalSend(item.id);
-      alert(`Đã nhận thuốc cho đơn ở id ${item.id} và học sinh có mã số ${item.studentId}`);
-      setLoading(true);
-      const res = await getNurseMedicalSentList();
-      setList(res.result || []);
-    } catch {
-      alert("Xác nhận thất bại!");
-    } finally {
-      setLoading(false);
-    }
+    setConfirm({
+      open: true,
+      action: async () => {
+        setConfirm({ ...confirm, open: false });
+        try {
+          await approveMedicalSend(item.id);
+          setToast({ message: `Đã nhận thuốc cho đơn ở id ${item.id} và học sinh có mã số ${item.studentId}`, type: 'success' });
+          setLoading(true);
+          const res = await getNurseMedicalSentList();
+          setList(res.result || []);
+        } catch {
+          setToast({ message: 'Xác nhận thất bại!', type: 'error' });
+        } finally {
+          setLoading(false);
+        }
+      },
+      item,
+      title: 'Xác nhận nhận thuốc',
+      message: 'Bạn có chắc chắn xác nhận đã nhận thuốc cho đơn này?'
+    });
   };
 
   // Xác nhận đã sử dụng thuốc
   const handleSetUse = async (item) => {
-    if (!window.confirm("Xác nhận học sinh đã sử dụng thuốc này?")) return;
-    try {
-      await setUse(item.id);
-      alert(`Đã xác nhận sử dụng thuốc cho đơn ở id ${item.id} và học sinh có mã số ${item.studentId}`);
-      setLoading(true);
-      const res = await getNurseMedicalSentList();
-      setList(res.result || []);
-    } catch {
-      alert("Xác nhận thất bại!");
-    } finally {
-      setLoading(false);
-    }
+    setConfirm({
+      open: true,
+      action: async () => {
+        setConfirm({ ...confirm, open: false });
+        try {
+          await setUse(item.id);
+          setToast({ message: `Đã xác nhận sử dụng thuốc cho đơn ở id ${item.id} và học sinh có mã số ${item.studentId}`, type: 'success' });
+          setLoading(true);
+          const res = await getNurseMedicalSentList();
+          setList(res.result || []);
+        } catch {
+          setToast({ message: 'Xác nhận thất bại!', type: 'error' });
+        } finally {
+          setLoading(false);
+        }
+      },
+      item,
+      title: 'Xác nhận sử dụng thuốc',
+      message: 'Bạn có chắc chắn xác nhận học sinh đã sử dụng thuốc này?'
+    });
   };
 
   const getStatusInfo = (status) => {
@@ -106,6 +165,18 @@ function ListMedicalSendForm() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 p-4 md:p-6">
+      {/* Toast notification */}
+      <Toast message={toast.message} type={toast.type} onClose={() => setToast({ ...toast, message: '' })} />
+      {/* Confirm modal */}
+      <ConfirmModal
+        open={confirm.open}
+        title={confirm.title}
+        message={confirm.message}
+        onConfirm={async () => {
+          if (confirm.action) await confirm.action();
+        }}
+        onCancel={() => setConfirm({ ...confirm, open: false })}
+      />
       <div className="max-w-7xl mx-auto">
         {/* Enhanced Header */}
         <div className="mb-8">

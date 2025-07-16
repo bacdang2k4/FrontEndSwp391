@@ -17,7 +17,8 @@ import {
   CheckBadgeIcon as CheckBadgeIconSolid,
   ShieldCheckIcon as ShieldCheckIconSolid
 } from "@heroicons/react/24/solid";
-import { getProfile } from "../api/axios";
+import { getProfile, updateProfile } from "../api/axios";
+import { useNavigate } from "react-router-dom";
 
 // Medical color palette
 const MEDICAL_COLORS = {
@@ -72,9 +73,14 @@ const ROLE_CONFIG = {
 };
 
 function ProfileForm() {
+  const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [editMode, setEditMode] = useState(false);
+  const [editData, setEditData] = useState({ firstName: '', lastName: '', phone: '', email: '' });
+  const [saving, setSaving] = useState(false);
+  const [toast, setToast] = useState({ message: '', type: '' });
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -82,6 +88,12 @@ function ProfileForm() {
         setLoading(true);
         const data = await getProfile();
         setProfile(data.result);
+        setEditData({
+          firstName: data.result.firstName || '',
+          lastName: data.result.lastName || '',
+          phone: data.result.phone || '',
+          email: data.result.email || '',
+        });
       } catch {
         setError("Không thể tải thông tin hồ sơ. Vui lòng thử lại sau.");
       } finally {
@@ -90,6 +102,14 @@ function ProfileForm() {
     };
     fetchProfile();
   }, []);
+
+  // Toast auto-close
+  useEffect(() => {
+    if (toast.message) {
+      const timer = setTimeout(() => setToast({ message: '', type: '' }), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('vi-VN', {
@@ -103,6 +123,34 @@ function ProfileForm() {
 
   const getRoleConfig = (role) => {
     return ROLE_CONFIG[role] || ROLE_CONFIG.PARENT;
+  };
+
+  // Handle edit
+  const handleEditClick = () => setEditMode(true);
+  const handleCancelEdit = () => {
+    setEditMode(false);
+    setEditData({
+      firstName: profile.firstName || '',
+      lastName: profile.lastName || '',
+      phone: profile.phone || '',
+      email: profile.email || '',
+    });
+  };
+  const handleEditChange = (e) => {
+    setEditData({ ...editData, [e.target.name]: e.target.value });
+  };
+  const handleSaveEdit = async () => {
+    setSaving(true);
+    try {
+      await updateProfile(editData);
+      setProfile({ ...profile, ...editData });
+      setEditMode(false);
+      setToast({ message: 'Cập nhật thông tin thành công!', type: 'success' });
+    } catch (err) {
+      setToast({ message: 'Cập nhật thất bại! ' + (err?.response?.data?.message || ''), type: 'error' });
+    } finally {
+      setSaving(false);
+    }
   };
 
   // Loading state with medical theme
@@ -159,6 +207,15 @@ function ProfileForm() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-sky-50 via-white to-emerald-50 py-8 px-4">
+      {/* Toast notification */}
+      {toast.message && (
+        <div className={`fixed top-6 right-6 z-50 px-6 py-4 rounded-lg shadow-lg text-white transition-all duration-300 ${toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}
+          onClick={() => setToast({ message: '', type: '' })}
+          role="alert"
+        >
+          {toast.message}
+        </div>
+      )}
       <div className="max-w-4xl mx-auto">
         {/* Header Section */}
         <div className="text-center mb-8">
@@ -226,9 +283,20 @@ function ProfileForm() {
                       Họ và tên đệm
                     </label>
                     <div className="relative">
-                      <div className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 group-hover:border-sky-300 transition-colors duration-200">
-                        <div className="font-medium text-gray-800">{profile.lastName}</div>
-                      </div>
+                      {editMode ? (
+                        <input
+                          type="text"
+                          name="lastName"
+                          value={editData.lastName}
+                          onChange={handleEditChange}
+                          className="bg-gray-50 border border-sky-300 rounded-xl px-4 py-3 w-full font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-sky-400"
+                          disabled={saving}
+                        />
+                      ) : (
+                        <div className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 group-hover:border-sky-300 transition-colors duration-200">
+                          <div className="font-medium text-gray-800">{profile.lastName}</div>
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div className="group">
@@ -236,9 +304,20 @@ function ProfileForm() {
                       Tên
                     </label>
                     <div className="relative">
-                      <div className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 group-hover:border-sky-300 transition-colors duration-200">
-                        <div className="font-medium text-gray-800">{profile.firstName}</div>
-                      </div>
+                      {editMode ? (
+                        <input
+                          type="text"
+                          name="firstName"
+                          value={editData.firstName}
+                          onChange={handleEditChange}
+                          className="bg-gray-50 border border-sky-300 rounded-xl px-4 py-3 w-full font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-sky-400"
+                          disabled={saving}
+                        />
+                      ) : (
+                        <div className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 group-hover:border-sky-300 transition-colors duration-200">
+                          <div className="font-medium text-gray-800">{profile.firstName}</div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -272,13 +351,24 @@ function ProfileForm() {
                     Địa chỉ email
                   </label>
                   <div className="relative">
-                    <div className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 group-hover:border-emerald-300 transition-colors duration-200 flex items-center gap-3">
-                      <EnvelopeIcon className="w-5 h-5 text-gray-400" />
-                      <div className="font-medium text-gray-800">{profile.email}</div>
-                      <div className="ml-auto">
-                        <CheckBadgeIcon className="w-5 h-5 text-emerald-500" />
+                    {editMode ? (
+                      <input
+                        type="email"
+                        name="email"
+                        value={editData.email}
+                        onChange={handleEditChange}
+                        className="bg-gray-50 border border-emerald-300 rounded-xl px-4 py-3 w-full font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                        disabled={saving}
+                      />
+                    ) : (
+                      <div className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 group-hover:border-emerald-300 transition-colors duration-200 flex items-center gap-3">
+                        <EnvelopeIcon className="w-5 h-5 text-gray-400" />
+                        <div className="font-medium text-gray-800">{profile.email}</div>
+                        <div className="ml-auto">
+                          <CheckBadgeIcon className="w-5 h-5 text-emerald-500" />
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                 </div>
 
@@ -288,10 +378,21 @@ function ProfileForm() {
                     Số điện thoại
                   </label>
                   <div className="relative">
-                    <div className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 group-hover:border-emerald-300 transition-colors duration-200 flex items-center gap-3">
-                      <PhoneIcon className="w-5 h-5 text-gray-400" />
-                      <div className="font-medium text-gray-800">{profile.phone}</div>
-                    </div>
+                    {editMode ? (
+                      <input
+                        type="text"
+                        name="phone"
+                        value={editData.phone}
+                        onChange={handleEditChange}
+                        className="bg-gray-50 border border-emerald-300 rounded-xl px-4 py-3 w-full font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                        disabled={saving}
+                      />
+                    ) : (
+                      <div className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 group-hover:border-emerald-300 transition-colors duration-200 flex items-center gap-3">
+                        <PhoneIcon className="w-5 h-5 text-gray-400" />
+                        <div className="font-medium text-gray-800">{profile.phone}</div>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -340,14 +441,42 @@ function ProfileForm() {
             {/* Action Buttons */}
             <div className="mt-8 pt-6 border-t border-gray-200">
               <div className="flex flex-col sm:flex-row gap-4">
-                <button className="flex-1 bg-gradient-to-r from-sky-500 to-emerald-500 text-white px-6 py-3 rounded-xl font-medium hover:from-sky-600 hover:to-emerald-600 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
-                  <PencilSquareIcon className="w-5 h-5" />
-                  Chỉnh sửa thông tin
-                </button>
-                <button className="flex-1 bg-white border border-gray-300 text-gray-700 px-6 py-3 rounded-xl font-medium hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 flex items-center justify-center gap-2">
-                  <ShieldCheckIcon className="w-5 h-5" />
-                  Đổi mật khẩu
-                </button>
+                {editMode ? (
+                  <>
+                    <button
+                      className="flex-1 bg-gradient-to-r from-green-500 to-emerald-500 text-white px-6 py-3 rounded-xl font-medium hover:from-green-600 hover:to-emerald-600 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 disabled:opacity-60"
+                      onClick={handleSaveEdit}
+                      disabled={saving}
+                    >
+                      <ArrowPathIcon className={`w-5 h-5 ${saving ? 'animate-spin' : ''}`} />
+                      Lưu thay đổi
+                    </button>
+                    <button
+                      className="flex-1 bg-white border border-gray-300 text-gray-700 px-6 py-3 rounded-xl font-medium hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 flex items-center justify-center gap-2"
+                      onClick={handleCancelEdit}
+                      disabled={saving}
+                    >
+                      Hủy
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      className="flex-1 bg-gradient-to-r from-sky-500 to-emerald-500 text-white px-6 py-3 rounded-xl font-medium hover:from-sky-600 hover:to-emerald-600 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                      onClick={handleEditClick}
+                    >
+                      <PencilSquareIcon className="w-5 h-5" />
+                      Chỉnh sửa thông tin
+                    </button>
+                    <button
+                      className="flex-1 bg-white border border-gray-300 text-gray-700 px-6 py-3 rounded-xl font-medium hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 flex items-center justify-center gap-2"
+                      onClick={() => navigate('/change-password')}
+                    >
+                      <ShieldCheckIcon className="w-5 h-5" />
+                      Đổi mật khẩu
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           </div>

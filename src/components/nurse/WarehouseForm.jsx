@@ -97,14 +97,6 @@ function WarehouseForm() {
     (item.nurseName || "").toLowerCase().includes(historySearch.toLowerCase())
   );
 
-  // Get stock status
-  const getStockStatus = (quantity) => {
-    if (quantity === 0) return { label: "Hết hàng", color: "bg-red-100 text-red-800", icon: "❌" };
-    if (quantity <= 10) return { label: "Sắp hết", color: "bg-yellow-100 text-yellow-800", icon: "⚠️" };
-    if (quantity <= 50) return { label: "Ít", color: "bg-orange-100 text-orange-800", icon: "📦" };
-    return { label: "Đủ", color: "bg-green-100 text-green-800", icon: "✅" };
-  };
-
   // Handle update
   const handleUpdate = async (id, type, currentQuantity) => {
     const value = Number(editValue);
@@ -143,13 +135,6 @@ function WarehouseForm() {
     }
   };
 
-  const stockStats = {
-    total: items.length,
-    outOfStock: items.filter(item => item.quantity === 0).length,
-    lowStock: items.filter(item => item.quantity > 0 && item.quantity <= 10).length,
-    inStock: items.filter(item => item.quantity > 50).length
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
@@ -182,7 +167,7 @@ function WarehouseForm() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600">Tổng vật tư</p>
-                  <p className="text-2xl font-bold text-gray-900">{stockStats.total}</p>
+                  <p className="text-2xl font-bold text-gray-900">{items.length}</p>
                 </div>
                 <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
                   <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -196,7 +181,7 @@ function WarehouseForm() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600">Hết hàng</p>
-                  <p className="text-2xl font-bold text-red-600">{stockStats.outOfStock}</p>
+                  <p className="text-2xl font-bold text-red-600">{items.filter(item => item.quantity === 0).length}</p>
                 </div>
                 <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
                   <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -210,7 +195,7 @@ function WarehouseForm() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600">Sắp hết</p>
-                  <p className="text-2xl font-bold text-yellow-600">{stockStats.lowStock}</p>
+                  <p className="text-2xl font-bold text-yellow-600">{items.filter(item => item.quantity > 0 && item.quantity <= 10).length}</p>
                 </div>
                 <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
                   <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -224,7 +209,7 @@ function WarehouseForm() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600">Đủ hàng</p>
-                  <p className="text-2xl font-bold text-green-600">{stockStats.inStock}</p>
+                  <p className="text-2xl font-bold text-green-600">{items.filter(item => item.quantity > 50).length}</p>
                 </div>
                 <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
                   <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -386,107 +371,97 @@ function WarehouseForm() {
                         <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số lượng</th>
                         <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Loại</th>
                         <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Đơn vị</th>
-                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
                         <th className="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Thao tác</th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {filteredItems.map((item, idx) => {
-                        const stockStatus = getStockStatus(item.quantity);
-                        return (
-                          <tr key={item.id} className="hover:bg-gray-50 transition-colors duration-200">
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{idx + 1}</td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center text-white font-bold">
-                                  {item.name?.charAt(0) || 'M'}
-                                </div>
-                                <div>
-                                  <div className="text-sm font-medium text-gray-900">{item.name}</div>
-                                  <div className="text-sm text-gray-500">ID: {item.id}</div>
-                                </div>
+                      {filteredItems.map((item, idx) =>
+                        <tr key={item.id} className="hover:bg-gray-50 transition-colors duration-200">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{idx + 1}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center text-white font-bold">
+                                {item.name?.charAt(0) || 'M'}
                               </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm font-bold text-gray-900">{item.quantity}</div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                {item.type}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.unit}</td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${stockStatus.color}`}>
-                                <span>{stockStatus.icon}</span>
-                                {stockStatus.label}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-center">
-                              {editId === item.id ? (
-                                <div className="space-y-2">
-                                  <input
-                                    type="number"
-                                    className="w-24 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                                    value={editValue}
-                                    min="1"
-                                    onChange={e => setEditValue(e.target.value)}
-                                    disabled={updating}
-                                    placeholder="Số lượng"
-                                  />
-                                  <div className="flex gap-2 justify-center">
-                                    <button
-                                      className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white text-xs font-medium rounded-lg hover:bg-green-700 transition-colors duration-200 disabled:opacity-50"
-                                      onClick={() => handleUpdate(item.id, editType, item.quantity)}
-                                      disabled={updating}
-                                    >
-                                      {updating ? (
-                                        <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
-                                      ) : (
-                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                        </svg>
-                                      )}
-                                      Lưu
-                                    </button>
-                                    <button
-                                      className="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-300 text-gray-700 text-xs font-medium rounded-lg hover:bg-gray-400 transition-colors duration-200 disabled:opacity-50"
-                                      onClick={() => { setEditId(null); setEditType(null); setEditValue(""); }}
-                                      disabled={updating}
-                                    >
-                                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                      </svg>
-                                      Hủy
-                                    </button>
-                                  </div>
-                                </div>
-                              ) : (
+                              <div>
+                                <div className="text-sm font-medium text-gray-900">{item.name}</div>
+                                <div className="text-sm text-gray-500">ID: {item.id}</div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm font-bold text-gray-900">{item.quantity}</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                              {item.type}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.unit}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-center">
+                            {editId === item.id ? (
+                              <div className="space-y-2">
+                                <input
+                                  type="number"
+                                  className="w-24 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                                  value={editValue}
+                                  min="1"
+                                  onChange={e => setEditValue(e.target.value)}
+                                  disabled={updating}
+                                  placeholder="Số lượng"
+                                />
                                 <div className="flex gap-2 justify-center">
                                   <button
-                                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200"
-                                    onClick={() => { setEditId(item.id); setEditType('add'); setEditValue(""); }}
+                                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white text-xs font-medium rounded-lg hover:bg-green-700 transition-colors duration-200 disabled:opacity-50"
+                                    onClick={() => handleUpdate(item.id, editType, item.quantity)}
+                                    disabled={updating}
                                   >
-                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                                    </svg>
-                                    Thêm
+                                    {updating ? (
+                                      <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+                                    ) : (
+                                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                      </svg>
+                                    )}
+                                    Lưu
                                   </button>
                                   <button
-                                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-orange-600 text-white text-xs font-medium rounded-lg hover:bg-orange-700 transition-colors duration-200"
-                                    onClick={() => { setEditId(item.id); setEditType('take'); setEditValue(""); }}
+                                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-300 text-gray-700 text-xs font-medium rounded-lg hover:bg-gray-400 transition-colors duration-200 disabled:opacity-50"
+                                    onClick={() => { setEditId(null); setEditType(null); setEditValue(""); }}
+                                    disabled={updating}
                                   >
                                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                     </svg>
-                                    Lấy
+                                    Hủy
                                   </button>
                                 </div>
-                              )}
-                            </td>
-                          </tr>
-                        );
-                      })}
+                              </div>
+                            ) : (
+                              <div className="flex gap-2 justify-center">
+                                <button
+                                  className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                                  onClick={() => { setEditId(item.id); setEditType('add'); setEditValue(""); }}
+                                >
+                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                  </svg>
+                                  Thêm
+                                </button>
+                                <button
+                                  className="inline-flex items-center gap-1 px-3 py-1.5 bg-orange-600 text-white text-xs font-medium rounded-lg hover:bg-orange-700 transition-colors duration-200"
+                                  onClick={() => { setEditId(item.id); setEditType('take'); setEditValue(""); }}
+                                >
+                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                                  </svg>
+                                  Lấy
+                                </button>
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      )}
                     </tbody>
                   </table>
                 </div>
