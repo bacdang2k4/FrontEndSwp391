@@ -22,7 +22,11 @@ export const isAuthenticated = () => {
   return !!getToken();
 };
 
-export const logout = (navigate) => {
+export const logoutAdmin = () => {
+  removeTokens();
+}; 
+
+export const logoutUser = (navigate) => {
   removeTokens();
   navigate('/login');
 }; 
