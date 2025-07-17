@@ -268,7 +268,7 @@ function UserManagement() {
                     <tr key={user.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
-                          <div className="text-sm font-medium text-gray-900">{(user.firstName || "") + " " + (user.lastName || "")}</div>
+                          <div className="text-sm font-medium text-gray-900">{(user.lastName || "") + " " + (user.firstName || "")}</div>
                           <div className="text-sm text-gray-500">{user.email}</div>
                         </div>
                       </td>
