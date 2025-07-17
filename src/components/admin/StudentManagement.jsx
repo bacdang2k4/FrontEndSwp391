@@ -105,7 +105,7 @@ function StudentManagement() {
           (parent.students || []).forEach(student => {
             allStudents.push({
               ...student,
-              parentName: `${parent.firstName} ${parent.lastName}`,
+              parentName: `${parent.lastName} ${parent.firstName}`,
               parentEmail: parent.email,
               parentPhone: parent.phone,
             });
@@ -178,7 +178,7 @@ function StudentManagement() {
         (parent.students || []).forEach(student => {
           allStudents.push({
             ...student,
-            parentName: `${parent.firstName} ${parent.lastName}`,
+            parentName: `${parent.lastName} ${parent.firstName}`,
             parentEmail: parent.email,
             parentPhone: parent.phone,
           });
@@ -217,7 +217,7 @@ function StudentManagement() {
             (parent.students || []).forEach(student => {
               allStudents.push({
                 ...student,
-                parentName: `${parent.firstName} ${parent.lastName}`,
+                parentName: `${parent.lastName} ${parent.firstName} `,
                 parentEmail: parent.email,
                 parentPhone: parent.phone,
               });
@@ -373,7 +373,7 @@ function StudentManagement() {
                       <tr key={student.id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm font-medium text-gray-900">
-                            {(student.firstName || "") + " " + (student.lastName || "")}
+                            {(student.lastName || "") + " " + (student.firstName || "")}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -501,7 +501,7 @@ function StudentManagement() {
                     <option value="">Chọn phụ huynh...</option>
                     {parents.map(parent => (
                       <option key={parent.id} value={parent.id}>
-                        {parent.firstName} {parent.lastName} ({parent.email})
+                         {parent.lastName} {parent.firstName} ({parent.email})
                       </option>
                     ))}
                   </select>
