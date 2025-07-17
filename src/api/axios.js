@@ -506,4 +506,8 @@ export const getMedicineUsageReport = async () => {
   return response.data;
 };
 
-
+// Gửi mail (Admin)
+export const sendAdminMail = async (mailData) => {
+  const response = await api.post('/v1/admin/send-mail', mailData);
+  return response.data;
+};
