@@ -344,9 +344,11 @@ function StudentManagement() {
                 onChange={(e) => setSelectedGrade(e.target.value)}
               >
                 <option value="">Tất cả khối lớp</option>
-                <option value="10">Lớp 10</option>
-                <option value="11">Lớp 11</option>
-                <option value="12">Lớp 12</option>
+                {classes.map(cls => (
+                  <option key={cls.id} value={cls.id}>
+                    {cls.name}
+                  </option>
+                ))}
               </select>
               <div className="flex items-center text-sm text-gray-600">
                 <FunnelIcon className="w-4 h-4 mr-2" />
