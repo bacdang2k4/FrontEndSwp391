@@ -23,112 +23,13 @@ import {
 } from "@heroicons/react/24/outline"
 import { useNavigate } from "react-router-dom"
 import { 
-  getUserReport, 
-  getHealthOverviewReport, 
-  getMedicalEventReport, 
   getVaccinationReport, 
-  getCheckupReport, 
-  getMedicineUsageReport,
   getAdminUserList,
   getAdminHealthRecordList,
   getAdminMedicalEventList,
   getAdminVaccinationList,
   getAdminCheckupEventList
 } from "../api/axios"
-
-
-const recentActivities = [
-  {
-    id: 1,
-    user: "BS. Nguyễn Thị Lan",
-    action: "đã thêm hồ sơ sức khỏe cho học sinh Trần Văn Minh",
-    time: "2 phút trước",
-    type: "create",
-    avatar: "👩‍⚕️",
-    details: "Lớp 6A - Khám sức khỏe định kỳ"
-  },
-  {
-    id: 2,
-    user: "Y tá Lê Thị Hoa",
-    action: "đã cập nhật thông tin tiêm chủng vaccine cúm",
-    time: "15 phút trước",
-    type: "update",
-    avatar: "👩‍⚕️",
-    details: "Batch #VF2025-001"
-  },
-  {
-    id: 3,
-    user: "BS. Phạm Văn Nam",
-    action: "đã xử lý sự kiện y tế khẩn cấp",
-    time: "1 giờ trước",
-    type: "alert",
-    avatar: "👨‍⚕️",
-    details: "Học sinh bị ngất tại lớp 8B"
-  },
-  {
-    id: 4,
-    user: "Y tá Hoàng Thị Mai",
-    action: "đã hoàn thành kiểm tra y tế định kỳ",
-    time: "2 giờ trước",
-    type: "complete",
-    avatar: "👩‍⚕️",
-    details: "Lớp 7C - 35/35 học sinh"
-  },
-  {
-    id: 5,
-    user: "Admin System",
-    action: "đã tạo báo cáo thống kê tháng 1",
-    time: "3 giờ trước",
-    type: "system",
-    avatar: "🤖",
-    details: "Báo cáo tự động hàng tháng"
-  },
-]
-
-const upcomingTasks = [
-  {
-    id: 1,
-    title: "Kiểm tra y tế định kỳ lớp 6A",
-    dueDate: "2025-01-10",
-    priority: "high",
-    status: "pending",
-    assignee: "BS. Nguyễn Thị Lan",
-    progress: 0,
-    icon: "🩺"
-  },
-  {
-    id: 2,
-    title: "Tiêm chủng vaccine cúm - Khối 7",
-    dueDate: "2025-01-12",
-    priority: "medium",
-    status: "in-progress",
-    assignee: "Y tá Lê Thị Hoa",
-    progress: 65,
-    icon: "💉"
-  },
-  {
-    id: 3,
-    title: "Cập nhật hồ sơ sức khỏe mới",
-    dueDate: "2025-01-15",
-    priority: "low",
-    status: "pending",
-    assignee: "Y tá Hoàng Thị Mai",
-    progress: 0,
-    icon: "📋"
-  },
-  {
-    id: 4,
-    title: "Đào tạo sơ cứu cho giáo viên",
-    dueDate: "2025-01-18",
-    priority: "medium",
-    status: "scheduled",
-    assignee: "BS. Phạm Văn Nam",
-    progress: 25,
-    icon: "🎓"
-  },
-]
-
-
 
 function DashboardForm() {
   const [currentTime, setCurrentTime] = useState(new Date())
@@ -150,6 +51,75 @@ function DashboardForm() {
     return () => clearInterval(timer)
   }, [])
 
+  // Helper function to format time ago
+  const getTimeAgo = (dateString) => {
+    const now = new Date()
+    const date = new Date(dateString)
+    const diffInMs = now - date
+    const diffInMinutes = Math.floor(diffInMs / (1000 * 60))
+    const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60))
+    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24))
+
+    if (diffInMinutes < 1) return "Vừa xong"
+    if (diffInMinutes < 60) return `${diffInMinutes} phút trước`
+    if (diffInHours < 24) return `${diffInHours} giờ trước`
+    return `${diffInDays} ngày trước`
+  }
+
+  // Helper function to generate recent activities from ongoing and completed events
+  const generateRecentActivities = (vaccinations, checkups) => {
+    const activities = []
+
+    // Add ongoing and completed vaccinations
+    const recentVaccinations = vaccinations.filter(vaccination => 
+      vaccination.status === 'isgoing' || vaccination.status === 'finished' || vaccination.status === 'completed' || vaccination.status === 'done'
+    ).slice(0, 3) // Limit to 3 most recent
+
+    recentVaccinations.forEach((vaccination) => {
+      const isOngoing = vaccination.status === 'isgoing'
+      activities.push({
+        id: `vaccination-${vaccination.id}`,
+        user: vaccination.assignedNurse || "Y tá",
+        action: isOngoing ? "đang tiến hành tiêm chủng" : "đã hoàn thành tiêm chủng",
+        time: getTimeAgo(vaccination.eventDate || vaccination.updatedAt),
+        type: isOngoing ? "ongoing" : "complete",
+        avatar: "💉",
+        details: `${vaccination.name} - ${vaccination.description || 'Tiêm chủng định kỳ'}`
+      })
+    })
+
+    // Add ongoing and completed checkups
+    const recentCheckups = checkups.filter(checkup => 
+      checkup.status === 'isgoing' || checkup.status === 'finished' || checkup.status === 'completed' || checkup.status === 'done'
+    ).slice(0, 3) // Limit to 3 most recent
+
+    recentCheckups.forEach((checkup) => {
+      const isOngoing = checkup.status === 'isgoing'
+      activities.push({
+        id: `checkup-${checkup.id}`,
+        user: checkup.assignedDoctor || "Bác sĩ",
+        action: isOngoing ? "đang tiến hành kiểm tra sức khỏe" : "đã hoàn thành kiểm tra sức khỏe",
+        time: getTimeAgo(checkup.eventDate || checkup.updatedAt),
+        type: isOngoing ? "ongoing" : "complete",
+        avatar: "🩺",
+        details: `${checkup.name} - ${checkup.description || 'Kiểm tra sức khỏe định kỳ'}`
+      })
+    })
+
+    // Sort by time (most recent first) and limit to 5 activities
+    return activities
+      .sort((a, b) => {
+        const timeA = a.time.includes('phút') ? parseInt(a.time) : 
+                     a.time.includes('giờ') ? parseInt(a.time) * 60 : 
+                     parseInt(a.time) * 1440
+        const timeB = b.time.includes('phút') ? parseInt(b.time) : 
+                     b.time.includes('giờ') ? parseInt(b.time) * 60 : 
+                     parseInt(b.time) * 1440
+        return timeA - timeB
+      })
+      .slice(0, 5)
+  }
+
   // Fetch dashboard data
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -161,7 +131,6 @@ function DashboardForm() {
           healthRecordsResponse,
           medicalEventsResponse,
           vaccinationResponse,
-          healthOverviewResponse,
           vaccinationReportResponse,
           checkupResponse
         ] = await Promise.all([
@@ -169,7 +138,6 @@ function DashboardForm() {
           getAdminHealthRecordList(),
           getAdminMedicalEventList(),
           getAdminVaccinationList(),
-          getHealthOverviewReport(),
           getVaccinationReport(),
           getAdminCheckupEventList()
         ])
@@ -179,7 +147,6 @@ function DashboardForm() {
         const medicalEvents = medicalEventsResponse.result || []
         const vaccinations = vaccinationResponse.result || []
         const checkups = checkupResponse.result || []
-        const healthOverview = healthOverviewResponse.result || healthOverviewResponse
         const vaccinationReport = vaccinationReportResponse.result || vaccinationReportResponse
 
         // Calculate statistics
@@ -188,28 +155,29 @@ function DashboardForm() {
         const totalMedicalEvents = medicalEvents.length
         const vaccinationRate = vaccinationReport?.vaccinationRate || 0
 
+        // Generate recent activities from completed events
+        const recentActivities = generateRecentActivities(vaccinations, checkups)
 
-
-        // Get upcoming tasks from vaccination and checkup events
+        // Get upcoming tasks from scheduled vaccination and checkup events only
         const upcomingVaccinations = vaccinations.filter(vaccination => 
-          vaccination.status === 'setup' || vaccination.status === 'isgoing'
+          vaccination.status === 'setup'
         ).map(vaccination => ({
           id: vaccination.id,
           title: `Tiêm chủng ${vaccination.name}`,
           dueDate: vaccination.eventDate,
-          status: vaccination.status === 'setup' ? 'scheduled' : 'in-progress',
+          status: 'scheduled',
           assignee: vaccination.assignedNurse || 'Chưa phân công',
           icon: '💉',
           type: 'vaccination'
         }))
 
         const upcomingCheckups = checkups.filter(checkup => 
-          checkup.status === 'setup' || checkup.status === 'isgoing'
+          checkup.status === 'setup'
         ).map(checkup => ({
           id: checkup.id,
           title: `Kiểm tra sức khỏe ${checkup.name}`,
           dueDate: checkup.eventDate,
-          status: checkup.status === 'setup' ? 'scheduled' : 'in-progress',
+          status: 'scheduled',
           assignee: checkup.assignedDoctor || 'Chưa phân công',
           icon: '🩺',
           type: 'checkup'
@@ -224,7 +192,7 @@ function DashboardForm() {
           totalHealthRecords,
           totalMedicalEvents,
           vaccinationRate,
-          recentActivities: recentActivities, // Keep static for now
+          recentActivities,
           upcomingTasks: allUpcomingTasks
         })
       } catch (error) {
@@ -395,36 +363,40 @@ function DashboardForm() {
               </div>
               
               <div className="space-y-4">
-                {recentActivities.map((activity) => (
-                  <div
-                    key={activity.id}
-                    className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-200"
-                  >
-                    <div className="text-2xl">{activity.avatar}</div>
-                    
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <p className="text-sm text-gray-900">
-                            <span className="font-semibold text-blue-600">{activity.user}</span> {activity.action}
-                          </p>
-                          <p className="text-xs text-gray-500 mt-1">{activity.details}</p>
+                {dashboardData.recentActivities.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    Không có hoạt động gần đây
+                  </div>
+                ) : (
+                  dashboardData.recentActivities.map((activity) => (
+                    <div
+                      key={activity.id}
+                      className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-200"
+                    >
+                      <div className="text-2xl">{activity.avatar}</div>
+                      
+                      <div className="flex-1">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <p className="text-sm text-gray-900">
+                              <span className="font-semibold text-blue-600">{activity.user}</span> {activity.action}
+                            </p>
+                            <p className="text-xs text-gray-500 mt-1">{activity.details}</p>
+                          </div>
+                          <span className="text-xs text-gray-400 whitespace-nowrap ml-4">
+                            {activity.time}
+                          </span>
                         </div>
-                        <span className="text-xs text-gray-400 whitespace-nowrap ml-4">
-                          {activity.time}
-                        </span>
                       </div>
-                    </div>
-                    
-                    <div className={`w-3 h-3 rounded-full ${
-                      activity.type === "create" ? "bg-green-500" :
-                      activity.type === "update" ? "bg-blue-500" :
-                      activity.type === "alert" ? "bg-red-500" :
+                      
+                                          <div className={`w-3 h-3 rounded-full ${
                       activity.type === "complete" ? "bg-purple-500" :
+                      activity.type === "ongoing" ? "bg-yellow-500" :
                       "bg-gray-500"
                     }`}></div>
-                  </div>
-                ))}
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           </div>
@@ -464,16 +436,8 @@ function DashboardForm() {
                           <span className="text-gray-500">
                             Hạn: {new Date(task.dueDate).toLocaleDateString('vi-VN')}
                           </span>
-                          <span className={`font-medium ${
-                            task.status === "pending" ? "text-gray-600" :
-                            task.status === "in-progress" ? "text-blue-600" :
-                            task.status === "scheduled" ? "text-purple-600" :
-                            "text-green-600"
-                          }`}>
-                            {task.status === "pending" ? "Chờ xử lý" :
-                             task.status === "in-progress" ? "Đang thực hiện" :
-                             task.status === "scheduled" ? "Đã lên lịch" :
-                             "Hoàn thành"}
+                          <span className="font-medium text-purple-600">
+                            Đã lên lịch
                           </span>
                         </div>
                         </div>

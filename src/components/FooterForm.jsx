@@ -249,7 +249,7 @@ function FooterForm() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-400">Điện thoại</p>
-                  <p className="text-white font-medium">024.1234.5678</p>
+                  <p className="text-white font-medium">0352437611</p>
                 </div>
               </div>
               
@@ -259,7 +259,7 @@ function FooterForm() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-400">Email</p>
-                  <p className="text-white font-medium">yte@fpt.edu.vn</p>
+                  <p className="text-white font-medium">bacddse180351@fpt.edu.vn</p>
                 </div>
               </div>
               
