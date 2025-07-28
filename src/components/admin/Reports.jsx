@@ -118,9 +118,7 @@ const monthlyData = [
 ]
 
 function Reports() {
-  const [dateFrom, setDateFrom] = useState("2024-01-01")
-  const [dateTo, setDateTo] = useState("2024-12-31")
-  const [reportFormat, setReportFormat] = useState("pdf")
+
   const [userReport, setUserReport] = useState(null)
   const [userReportLoading, setUserReportLoading] = useState(false)
   const [userReportError, setUserReportError] = useState(null)
@@ -219,13 +217,8 @@ function Reports() {
   }, [])
 
   const handleGenerateReport = (reportType) => {
-    console.log("Generating report:", reportType, { dateFrom, dateTo, reportFormat })
+    console.log("Generating report:", reportType)
     // Implement report generation logic
-  }
-
-  const handleExportData = (format) => {
-    console.log("Exporting data in format:", format)
-    // Implement export logic
   }
 
   return (
@@ -234,62 +227,12 @@ function Reports() {
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="mb-8">
-            <div className="flex justify-between items-center">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-                  <ChartBarIcon className="w-8 h-8 text-red-600" />
-                  Báo cáo và thống kê
-                </h1>
-                <p className="text-gray-600 mt-1">Tạo và xuất các báo cáo chi tiết</p>
-              </div>
-              <div className="flex gap-3">
-                <button
-                  onClick={() => handleExportData("excel")}
-                  className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center gap-2"
-                >
-                  <DocumentArrowDownIcon className="w-5 h-5" />
-                  Xuất Excel
-                </button>
-                <button
-                  onClick={() => handleExportData("pdf")}
-                  className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 flex items-center gap-2"
-                >
-                  <DocumentArrowDownIcon className="w-5 h-5" />
-                  Xuất PDF
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Date Range Filter */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <CalendarDaysIcon className="w-5 h-5 text-gray-400" />
-                <span className="text-sm font-medium text-gray-700">Khoảng thời gian:</span>
-              </div>
-              <input
-                type="date"
-                value={dateFrom}
-                onChange={(e) => setDateFrom(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-              />
-              <span className="text-gray-500">đến</span>
-              <input
-                type="date"
-                value={dateTo}
-                onChange={(e) => setDateTo(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-              />
-              <select
-                value={reportFormat}
-                onChange={(e) => setReportFormat(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-              >
-                <option value="pdf">PDF</option>
-                <option value="excel">Excel</option>
-                <option value="csv">CSV</option>
-              </select>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                <ChartBarIcon className="w-8 h-8 text-red-600" />
+                Báo cáo và thống kê
+              </h1>
+              <p className="text-gray-600 mt-1">Xem các báo cáo chi tiết</p>
             </div>
           </div>
 
